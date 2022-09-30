@@ -23,10 +23,10 @@ namespace Jogo_de_tiro
         {
             ArrayList frames = new ArrayList()
             {
-                new Rectangle(0, 0, 60, 100),
-                new Rectangle(60, 0, 60, 100),
-                new Rectangle(120, 0, 60, 100),
-                new Rectangle(180, 0, 60, 100)
+                new Rectangle(0, 0, 100, 100),
+                new Rectangle(100, 0, 100, 100),
+                new Rectangle(200, 0, 100, 100),
+                new Rectangle(300, 0, 100, 100)
             };
             _sprite = new AnimatedSprite(texture, position, frames);
         }
