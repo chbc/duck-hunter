@@ -8,6 +8,12 @@ namespace Jogo_de_tiro
     class Bomb
     {
         AnimatedSprite _sprite;
+        int _xDirection;
+        int _speed;
+        int _xSpeedModifier;
+
+        const int INITIAL_SPEED = 200;
+        const int INITIAL_POSITION_OFFSET = 200;
 
         public Rectangle Bounds
         {
@@ -28,15 +34,23 @@ namespace Jogo_de_tiro
                 new Rectangle(200, 0, 100, 100),
                 new Rectangle(300, 0, 100, 100)
             };
+
             _sprite = new AnimatedSprite(texture, position, frames);
+            _xDirection = 1;
+            _xSpeedModifier = 1;
+        }
+
+        public void Initialize()
+        {
+            _speed = INITIAL_SPEED;
         }
 
         public void Update(double deltaTime)
         {
-            const double SPEED = 300.0f;
-            int resultSpeed = (int)(SPEED * deltaTime);
+            int resultSpeed = (int)(_speed * deltaTime);
             Point newLocation = _sprite.Location;
-            newLocation.Y = newLocation.Y + resultSpeed;
+            newLocation.Y = newLocation.Y - resultSpeed;
+            newLocation.X = newLocation.X + (resultSpeed * (_xDirection * _xSpeedModifier));
 
             _sprite.Location = newLocation;
             _sprite.Update(deltaTime);
@@ -59,12 +73,28 @@ namespace Jogo_de_tiro
             return result;
         }
 
-        public void Restart(Random random, int ViewportWidth)
+        public void CheckSideCollision(int screenWidth)
         {
-            Rectangle drawArea = _sprite.GetDrawArea();
-            int y = -_sprite.Height;
-            int x = random.Next(0, (ViewportWidth - drawArea.Width));
+            Rectangle bounds = this.GetFrameBounds();
+            if (bounds.X < 0)
+            {
+                _xDirection = 1;
+            }
+            else if  ((bounds.X + bounds.Width) > screenWidth)
+            {
+                _xDirection = -1;
+            }
+        }
+
+        public void Restart(Random random, int screenWidth, int screenHeight)
+        {
+            Rectangle bounds = _sprite.GetFrameBounds();
+            int y = screenHeight - INITIAL_POSITION_OFFSET;
+            int x = random.Next(0, (screenWidth - bounds.Width));
             _sprite.Location = new Point(x, y);
+            _speed += 10;
+            _xSpeedModifier = (_xSpeedModifier == 1) ? 2 : 1;
+            _xDirection = -_xDirection;
         }
 
         public Rectangle GetDrawArea()

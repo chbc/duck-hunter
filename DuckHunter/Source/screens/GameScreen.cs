@@ -4,12 +4,14 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using System;
+using System.Collections;
 
 namespace Jogo_de_tiro
 {
     class GameScreen
     {
-        private GameObject _defenseSpot;
+        private GameObject _fense;
+        private AnimatedSprite _tree;
         private Bomb _bomb;
         private Explosion _explosion;
         private Crosshair _sparks;
@@ -31,18 +33,30 @@ namespace Jogo_de_tiro
             _background = new GameObject(content.Load<Texture2D>("game_background"), new Rectangle(0, 0, screenWidth, screenHeight));
             _failScore = new Score(gameFont, 3, "Falhas:", new Vector2(10.0f, 50.0f));
             _hitScore = new Score(gameFont, 10, "Acertos:", new Vector2(10.0f, 10.0f));
-            Texture2D texture = content.Load<Texture2D>("defense_spot");
+            Texture2D texture = content.Load<Texture2D>("fense");
             int yPositionDefense = (screenHeight - texture.Height);
-            _defenseSpot = new GameObject(texture, new Point(0, yPositionDefense));
+            _fense = new GameObject(texture, new Point(0, yPositionDefense));
 
             texture = content.Load<Texture2D>("target_item");
-            _bomb = new Bomb(texture, Point.Zero);
+            _bomb = new Bomb(texture, new Point(0, _screenHeight));
 
             texture = content.Load<Texture2D>("explosion");
             _explosion = new Explosion(texture, Point.Zero);
 
             texture = content.Load<Texture2D>("sparks");
             _sparks = new Crosshair(texture, Point.Zero);
+
+            texture = content.Load<Texture2D>("tree");
+            const int TREE_WIDTH = 400;
+            const int TREE_HEIGHT = 800;
+            ArrayList frames = new ArrayList()
+            {
+                new Rectangle(0, 0, TREE_WIDTH, TREE_HEIGHT),
+                new Rectangle(TREE_WIDTH, 0, TREE_WIDTH, TREE_HEIGHT),
+                new Rectangle(TREE_WIDTH * 2, 0, TREE_WIDTH, TREE_HEIGHT),
+                new Rectangle(TREE_WIDTH * 3, 0, TREE_WIDTH, TREE_HEIGHT),
+            };
+            _tree = new AnimatedSprite(texture, new Point(-100, _screenHeight - TREE_HEIGHT), frames);
 
             _random = new Random();
             _isTouchEnabled = true;
@@ -66,11 +80,12 @@ namespace Jogo_de_tiro
                 return;
             }
 
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Q))
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
             {
                 game.ChangeScreen(EGameScreen.Menu);
             }
 
+            _tree.Update(deltaTime);
             _bomb.Update(deltaTime);
             _sparks.Update(deltaTime);
 
@@ -99,17 +114,20 @@ namespace Jogo_de_tiro
 
             Rectangle bombBounds = _bomb.GetFrameBounds();
 
-            if (bombHit || bombBounds.Y > _screenHeight - bombBounds.Height)
+            if (bombHit)
             {
                 _explosion.Location = bombBounds.Location;
-                _bomb.Restart(_random, _screenWidth);
-
                 _explosion.Play();
-
-                if (!bombHit)
-                {
-                    _failScore.Increment();
-                }
+                _bomb.Restart(_random, _screenWidth, _screenHeight);
+            }
+            else if (bombBounds.Y < -bombBounds.Height)
+            {
+                _bomb.Restart(_random, _screenWidth, _screenHeight);
+                _failScore.Increment();
+            }
+            else
+            {
+                _bomb.CheckSideCollision(_screenWidth);
             }
 
             _explosion.Update(deltaTime);
@@ -124,12 +142,14 @@ namespace Jogo_de_tiro
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(_background.Texture, _background.Bounds, Color.White);
-            spriteBatch.Draw(_defenseSpot.Texture, _defenseSpot.Bounds, Color.White);
+            spriteBatch.Draw(_tree.Texture, _tree.GetFrameBounds(), _tree.GetDrawArea(), Color.White);
             spriteBatch.Draw(_bomb.Texture, _bomb.GetFrameBounds(), _bomb.GetDrawArea(), Color.White);
             if (_explosion.Visible)
             {
                 spriteBatch.Draw(_explosion.Texture, _explosion.Bounds, Color.White);
             }
+
+            spriteBatch.Draw(_fense.Texture, _fense.Bounds, Color.White);
 
             if (_sparks.Visible)
             {
@@ -148,6 +168,7 @@ namespace Jogo_de_tiro
             _failScore.Reset();
             _duration = 0;
             _endTrasition = false;
+            _bomb.Initialize();
         }
     }
 }

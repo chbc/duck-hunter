@@ -37,10 +37,8 @@ namespace Jogo_de_tiro
 
         public int Width
         {
-            get
-            {
-                return _bounds.Width;
-            }
+            get { return _bounds.Width; }
+            set { _bounds.Width = value; }
         }
 
         public GameObject(Texture2D texture, Point position)

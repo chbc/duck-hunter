@@ -44,6 +44,10 @@ namespace Jogo_de_tiro
             {
                 game.ChangeScreen(EGameScreen.Game);
             }
+            else if (_creditsButton.IsPressed())
+            {
+                game.ChangeScreen(EGameScreen.Credits);
+            }
             else if (_exitButton.IsPressed())
             {
                 game.Exit();

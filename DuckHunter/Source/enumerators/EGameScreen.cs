@@ -5,6 +5,7 @@ namespace Jogo_de_tiro
     {
         Menu,
         Game,
+        Credits,
         GameOver
     }
 }

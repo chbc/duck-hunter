@@ -7,6 +7,7 @@ public class Game1 : Game
 {
     private MenuScreen _menuScreen;
     private GameScreen _gameScreen;
+    private CreditsScreen _creditsScreen;
     private GameOverScreen _gameOverScreen;
 
     private SpriteBatch _spriteBatch;
@@ -34,6 +35,9 @@ public class Game1 : Game
             case EGameScreen.Game:
                 _gameScreen.Initialize();
                 break;
+            case EGameScreen.Credits:
+                _creditsScreen.Initialize();
+                break;
             case EGameScreen.GameOver:
                 _gameOverScreen.Initialize();
                 break;
@@ -54,6 +58,7 @@ public class Game1 : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         _menuScreen = new MenuScreen(Content, displayMode.Width, displayMode.Height);
         _gameScreen = new GameScreen(Content, displayMode.Width, displayMode.Height);
+        _creditsScreen = new CreditsScreen(Content, displayMode.Width, displayMode.Height);
         _gameOverScreen = new GameOverScreen(Content, displayMode.Width, displayMode.Height);
 
         _gameScreenType = EGameScreen.Menu;
@@ -68,6 +73,9 @@ public class Game1 : Game
                 break;
             case EGameScreen.Game:
                 _gameScreen.Update(this, gameTime.ElapsedGameTime.TotalSeconds);
+                break;
+            case EGameScreen.Credits:
+                _creditsScreen.Update(this, gameTime.ElapsedGameTime.TotalSeconds);
                 break;
             case EGameScreen.GameOver:
                 _gameOverScreen.Update(this, gameTime.ElapsedGameTime.TotalSeconds);
@@ -91,6 +99,9 @@ public class Game1 : Game
                 break;
             case EGameScreen.Game:
                 _gameScreen.Draw(_spriteBatch);
+                break;
+            case EGameScreen.Credits:
+                _creditsScreen.Draw(_spriteBatch);
                 break;
             case EGameScreen.GameOver:
                 _gameOverScreen.Draw(_spriteBatch);

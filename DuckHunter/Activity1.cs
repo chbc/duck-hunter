@@ -30,5 +30,30 @@ namespace Jogo_de_tiro
             SetContentView(_view);
             _game.Run();
         }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+            HideSystemUI();
+        }
+
+        private void HideSystemUI()
+        {
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
+            {
+                View decorView = Window.DecorView;
+                var uiOptions = (int)decorView.SystemUiVisibility;
+                var newUiOptions = (int)uiOptions;
+
+                newUiOptions |= (int)SystemUiFlags.LowProfile;
+                newUiOptions |= (int)SystemUiFlags.Fullscreen;
+                newUiOptions |= (int)SystemUiFlags.HideNavigation;
+                newUiOptions |= (int)SystemUiFlags.ImmersiveSticky;
+
+                decorView.SystemUiVisibility = (StatusBarVisibility)newUiOptions;
+
+                this.Immersive = true;
+            }
+        }
     }
 }
